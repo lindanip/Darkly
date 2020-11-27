@@ -1,6 +1,6 @@
 # Recovery_Page
 
-email store explictly in front-end textbox
+Recovery email stored in front-end textbox
 
 ## Where
 
@@ -22,7 +22,7 @@ So we the email stored in the front-end like this we can the change the email to
 
 ## Solution
 
-We should not store the recovery email on the front end like this. it should be store at the backend.
+We should not store the recovery email on the front end like this. It should be store at the backend, and user must provide their email so that they can get an email from the server, thus we can even verify whether the email address provided by the user exist in our database. 
 
 
 

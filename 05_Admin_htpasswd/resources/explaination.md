@@ -11,3 +11,4 @@ and if we decrypt the hash it converts to dragon
 if we use this to login to the [http://10.203.69.31/admin/#](http://10.203.69.31/admin/# "admin_page") admin page we get the flag 
 
 ## Solution
+No senstive information should be store like this because everyone has access to these folders
