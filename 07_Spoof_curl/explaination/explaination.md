@@ -29,6 +29,12 @@ The output
 <h2 style="margin-top:50px;"> The flag is : f2a29020ef3132e01dd61df97fd33ec8d7fcd1388cc9601e7db691d17d4d6188</h2><br/><img src="images/win.png" alt="" width=200px height=200px></center> <audio id="best_music_ever" src="audio/music.mp3"preload="true" loop="loop" autoplay="autoplay">
 ```
 
+## Issues
+Spoofing is dangourous because a hacker can pretend to be someone else by performing ***ip spoofing***. Hacker tend to use this exploit to preform DDOS (Direct Denial Of Service)
+
+## Solution
+There are tools, to monitor the network that, try to help detect spoofing.
+
 
 
 
