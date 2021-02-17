@@ -7,6 +7,7 @@ This project gives an introduction to computer security in the web domain.
 1. Virtual Machine to run iso image.
 1. Download iso image from
 [https://projects.intra.42.fr/uploads/document/document/307/Darkly_i386.iso.](https://projects.intra.42.fr/uploads/document/document/307/Darkly_i386.iso.)
+3. Kali Linux (optional).
 
 ## Exploits
 
